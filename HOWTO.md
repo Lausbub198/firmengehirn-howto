@@ -2,14 +2,15 @@
 
 Begleit-Anleitung zum Video von **Lokale KI mit Andreas Nürenberg**. Am Ende läuft auf deinem Rechner eine
 Chat-Oberfläche wie ChatGPT, mit lokalem Sprachmodell, im Look des „Firmengehirns" aus der Erklär-Serie,
-mit Agenten, Diagrammen, Diktat und einem Wissensspeicher, der mit Fundstelle antwortet.
+mit Agenten, Diagrammen, Diktat und einem Wissensspeicher, der mit Fundstelle antwortet. Den RAG-Teil (Suchen in den
+Unterlagen) übernimmt der Dokumentenassistent, angebunden per MCP.
 
 | | |
 |---|---|
 | **Stand** | November 2026, LibreChat **v0.8.8** · englische Fassung: `HOWTO.en.md` |
 | **Getestet** | macOS (Apple Silicon, 24 GB RAM): Schritte 0–5. Linux/Windows nach offizieller Doku, Markierung **[ungetestet]** |
 | **Dauer** | ca. 1–2 Stunden inkl. Downloads |
-| **Kosten** | keine — alle Bausteine sind Open Source |
+| **Kosten** | keine — die Software ist quelloffen, Gemma ist ein Open-Weight-Modell (Gemma-Nutzungsbedingungen) |
 | **Daten** | nur der **synthetische** Demo-Bestand „Malerbetrieb Hoffmann" aus dem Dokumentenassistenten. Bitte für den Nachbau keine echten Firmenunterlagen verwenden |
 
 Jeder Schritt hat ein **Ziel**, **Befehle zum Kopieren**, ein **Soll** (was du sehen musst) und **Wenn's hakt**.
@@ -24,7 +25,8 @@ Für den Agenten gelten diese Regeln:
 1. **Ordner zuerst klären** (Tabelle „Feste Ordner“ unten) und dem Menschen zur Bestätigung zeigen. Betriebssystem erkennen
    (`uname -s` bzw. Windows) und nur die passenden Befehle verwenden.
 2. **Vor jedem Download, jeder Installation mit Administratorrechten und jedem `brew trust` nachfragen.**
-   Downloads: Ollama-Modelle (mehrere GB), Whisper-Modell (~570 MB), Pakete.
+   Downloads: Ollama-Modelle (mehrere GB), Whisper-Modell (~570 MB), Reranker `BAAI/bge-reranker-v2-m3` (~2 GB) und
+   OCR-Modelle des Dokumentenassistenten (beim ersten Start), Pakete.
 3. **Nach jedem Schritt die Prüfung („Soll") ausführen.** Schlägt sie fehl: anhalten, „Wenn's hakt" abarbeiten,
    dem Menschen berichten. Nicht mit dem nächsten Schritt weitermachen.
 4. **Nur den synthetischen Demo-Bestand anbinden.** Nie Ordner mit echten Dokumenten als `--quelle` verwenden.
@@ -62,6 +64,18 @@ Ohne Git: auf https://github.com/Lausbub198/firmengehirn-howto **Code → Downlo
 Benutzerordner legen und in `firmengehirn-howto` umbenennen. Soll: `ls ~/firmengehirn-howto` zeigt
 `HOWTO.md`, `firmengehirn-skin` und `librechat-yaml`.
 
+**Werkzeuge zum Installieren** (nur was noch fehlt):
+
+| Werkzeug | wofür | Installation |
+|---|---|---|
+| Homebrew (macOS) | whisper-cpp, ffmpeg, MongoDB nativ | Befehl von https://brew.sh |
+| nvm | Node.js 24 neben einem vorhandenen Node | Befehl von https://github.com/nvm-sh/nvm (Windows: nvm-windows) |
+| uv | Dokumentenassistent (Schritt 5); holt Python 3.13 selbst | `curl -LsSf https://astral.sh/uv/install.sh \| sh`, Doku https://docs.astral.sh/uv/ |
+| Docker Desktop (optional) | nur für MongoDB-Variante a | https://www.docker.com/products/docker-desktop/ |
+
+Soll: `brew --version` (macOS), `nvm --version` und `uv --version` zeigen je eine Versionsnummer. Danach das Terminal
+einmal schließen und neu öffnen, damit es die neuen Befehle kennt.
+
 **Git** — prüfen: `git --version`. Fehlt es: macOS `xcode-select --install`, Linux Paketmanager, Windows https://git-scm.com.
 
 **Ollama** — Installation von https://ollama.com (macOS, Linux, Windows). Dann:
@@ -87,7 +101,8 @@ Macs; danach den Befehl wiederholen.
 *Windows:* Umgebungsvariable `OLLAMA_CONTEXT_LENGTH` mit Wert `16384` für den Benutzer anlegen, Ollama neu starten.
 **[ungetestet]**
 
-Soll: Nach der ersten Frage zeigt `ollama ps` in der Spalte `CONTEXT` den Wert `16384`. Mehr Kontext braucht mehr
+Soll: Nach der ersten Frage zeigt `ollama ps` in der Spalte `CONTEXT` den Wert `16384` (oder `32768`, wenn zuletzt der
+Dokumentenassistent aus Schritt 5 eingeordnet hat — der stellt das Modell selbst größer ein; beides ist in Ordnung). Mehr Kontext braucht mehr
 Arbeitsspeicher; bei `gemma4:12b-it-q4_K_M` auf 24 GB passt es.
 
 **Node.js 24** (LibreChat v0.8.8 verlangt Node 24, npm 11). Am einfachsten über nvm, damit ein vorhandenes Node bleibt:
@@ -213,6 +228,8 @@ npm run backend
 
 Soll: im Log „Connected to MongoDB", „Custom config file loaded", „Server listening at http://localhost:3080".
 Im Browser http://localhost:3080 → **Registrieren** (lokales Konto) → oben „Ollama" und das Modell wählen → Frage stellen → Antwort kommt.
+Das erste Konto ist automatisch **Admin**. Die Registrierung bleibt vorerst offen, Schritt 3 braucht ein zweites
+Testkonto; geschlossen wird sie in Schritt 7.
 
 **Wenn's hakt:**
 - „Could not read package.json" → `npm` im falschen Ordner, erst `cd ~/Projects/librechat`.
@@ -221,8 +238,9 @@ Im Browser http://localhost:3080 → **Registrieren** (lokales Konto) → oben �
 - Build bricht ab → `node -v` prüfen, Node 24 muss in diesem Terminal aktiv sein.
 - Modell fehlt in der Auswahl → läuft Ollama? `curl -s http://localhost:11434/api/tags`.
 - Artefakte kommen nur als Code, Werkzeuge werden nicht aufgerufen, das Modell „vergisst" Anweisungen → Kontext prüfen:
-  `ollama ps` muss bei `CONTEXT` 16384 zeigen, sonst den Schritt „Ollama mehr Kontext geben" in Schritt 0 wiederholen.
-- Harmlos im Log: „scheduler NOT started" (betrifft nur geplante Chats), „RAG API … not reachable" (RAG nutzen wir nicht),
+  `ollama ps` muss bei `CONTEXT` 16384 (oder 32768) zeigen, sonst den Schritt „Ollama mehr Kontext geben" in Schritt 0 wiederholen.
+- Harmlos im Log: „scheduler NOT started" (betrifft nur geplante Chats), „RAG API … not reachable" (LibreChats eingebaute RAG-API nutzen wir nicht, das Suchen in den Unterlagen macht der
+  Dokumentenassistent in Schritt 5),
   „METRICS_SECRET is not set".
 
 **Alternative mit Docker:** LibreChat lässt sich auch per `docker compose up -d` starten (Doku: https://www.librechat.ai/docs/local/docker).
@@ -287,7 +305,9 @@ node ~/firmengehirn-howto/firmengehirn-skin/skin.mjs standard --lc ~/Projects/li
 >
 > `standard` setzt `.env` zurück (`APP_TITLE=LibreChat`, keine Fußzeile, keine Farbzeilen), löscht die Firmengehirn-Logos,
 > holt LibreChats Original-`logo.svg` aus dessen git zurück und legt neutrale Fassungen von `firmengehirn.css` und
-> `firmengehirn.js` ab; die Zeilen in `index.html` und `style.css` bleiben, sie wirken dann nicht mehr. Nachvollziehen: `git -C ~/Projects/librechat diff` zeigt die Änderungen an `client/`,
+> `firmengehirn.js` ab; die Zeilen in `index.html` und `style.css` bleiben, sie wirken dann nicht mehr. Nachvollziehen: `git -C ~/Projects/librechat status` und `git -C ~/Projects/librechat diff` zeigen die Änderungen an `client/`;
+> ganz zurück auf den Auslieferungszustand mit `git -C ~/Projects/librechat restore client/index.html client/src/style.css client/public/assets/logo.svg`
+> (`.env` liegt nicht in git, dafür bleibt `standard` nötig),
 > `grep -E "APP_TITLE|CUSTOM_FOOTER|REACT_APP_THEME" ~/Projects/librechat/.env` die in `.env`.
 >
 > Eigene Farben: Zeilen in `firmengehirn-skin/neon/env-theme.txt` ändern (Wert „R G B", z. B. `36 37 94`) und den
@@ -332,13 +352,13 @@ in Schritt 5.
      **Tools → Hinzufügen → Nativ**) · **Skills**: Off · **Dateikontext** leer
    - **Erstellen**. Soll: Der Agent steht unter „Agent auswählen" und im Chat im Modellmenü unter **My Agents**.
    - Gesprächseinstiege (Startfragen als Knöpfe) bietet der Agenten-Editor in v0.8.8 nicht — die Fragen werden getippt.
-5. **Teilen:** zweites Testkonto in einem privaten Browserfenster registrieren → im Agenten **Teilen** → Person suchen →
+5. **Teilen** (ab Werk darf das nur der Admin, also das erste Konto): zweites Testkonto in einem privaten Browserfenster registrieren → im Agenten **Teilen** → Person suchen →
    Rolle **Betrachter**. Soll: Das zweite Konto findet den Agenten im Modellmenü unter **My Agents** und nutzt ihn; öffnet es den Editor,
    steht dort „keine Berechtigung, diesen Agenten zu bearbeiten".
 
 **Wenn's hakt:**
 - Statt Artefakt-Knopf nur Code → dem Modell fehlt der Rahmen `:::artifact{…}` … `:::`. Noch einmal ausdrücklich
-  mit diesem Rahmen anfordern, oder unter Artefakte → **Benutzerdefinierter Promptmodus** eine kurze, harte Regel eintragen.
+  mit diesem Rahmen anfordern, oder unter Artefakte → **Benutzerdefinierter Promptmodus für Artefakte** eine kurze, harte Regel eintragen.
   Kleinere Modelle vergessen den Rahmen bei langen Antworten.
 - Diagramm-Kästen schwer lesbar → „ohne eigene Farben" verlangen.
 - HTML-/React-Artefakte laden laut LibreChat-Doku einen Baustein aus dem CodeSandbox-Netz — ohne Internet nur Code.
@@ -440,14 +460,14 @@ sed -e "s#__MODELL__#gemma4:12b-it-q4_K_M#g" ~/firmengehirn-howto/librechat-yaml
 > | `args: run --project ~/Projects/dokumentenassistent dokumentenassistent-mcp` | startet den Werkzeug-Teil (MCP) des Dokumentenassistenten, der nur lesen kann |
 > | `--quelle …/malerbetrieb-demo/Quelle`, `--ziel ~/dokass-demo-ziel` | derselbe Demo-Bestand wie beim Einordnen oben — nur freigegebene Dokumente sind sichtbar |
 > | `--modelle …/modelle.yaml` | welche lokalen Modelle der Dokumentenassistent zum Suchen nutzt |
-> | `--nur-belege`, `"5"` | `suchen` liefert nur die fünf besten Absätze mit Link; LibreChats Modell formuliert die Antwort einmal statt zweimal. Gemessen mit Kontext 16384 und Netzteil: 26–31 s je Frage, also knapp 30 Sekunden, alle Prüffragen richtig. Dafür entfällt die Zitatprüfung des Dokumentenassistenten — der Link zur Fundstelle bleibt. Braucht den Dokumentenassistenten ab dem Stand vom 26.10.2026 (`git pull`) |
+> | `--nur-belege`, `"5"` | `suchen` liefert nur die fünf besten Absätze mit Link; LibreChats Modell formuliert die Antwort einmal statt zweimal. Gemessen mit Kontext 16384 und Netzteil: 26–31 s je Frage, also knapp 30 Sekunden, alle Prüffragen richtig (das README des Dokumentenassistenten nennt 16–22 s aus einer früheren Messung am 26.10.2026; maßgeblich für dieses HowTo ist die Messung aus dem Video). Dafür entfällt die Zitatprüfung des Dokumentenassistenten — der Link zur Fundstelle bleibt. Braucht den Dokumentenassistenten ab dem Stand vom 26.10.2026 (`git pull`) |
 > | `env: HF_HUB_OFFLINE: "1"`, `TRANSFORMERS_OFFLINE: "1"` | der Reranker fragt beim Start sonst bei Hugging Face nach neuen Modellversionen; so bleibt er offline und nimmt die schon geladene Fassung |
 > | `initTimeout: 120000` | LibreChat wartet beim Start bis zu 2 Minuten auf den Dokumentenassistenten (ab Werk 30 s); der lädt dabei seinen Reranker |
 > | `timeout: 120000` | LibreChat wartet bis zu 2 Minuten auf eine Antwort (der erste Aufruf lädt Modelle) |
 
 
 Soll: `command -v uv` zeigt einen Pfad — sonst fehlt `uv` im Terminal (siehe oben). LibreChat aus **diesem** Terminal starten.
-Soll: Unter den Werkzeugen erscheint der MCP-Server „dokumentenassistent" mit `suchen`, `fundstelle_lesen`, `datei_oeffnen`.
+Soll: Im Agenten-Editor unter **Tools → Hinzufügen** steht der MCP-Server „dokumentenassistent" (nächster Absatz).
 
 **Dem Abgleicher sein Wissen geben:** Agent aus Schritt 3 öffnen → **Tools** → **Hinzufügen** → **dokumentenassistent**.
 Soll: Unter Tools steht `dokumentenassistent · 3` (`suchen`, `fundstelle_lesen`, `datei_oeffnen`) → **Speichern**.
@@ -472,7 +492,7 @@ darunter `Quelle: Rechnung (6).pdf, Seite 1` als Link; ein Klick öffnet das PDF
   der Dokumentenassistent startet zu langsam (Reranker wird von einer langsamen Platte gelesen). `initTimeout` prüfen,
   den Hugging-Face-Cache (`~/.cache/huggingface`) auf eine schnelle interne Platte legen, LibreChat neu starten.
 - Keine Zeile „dokumentenassistent" über der Antwort → das Modell hat nicht gesucht: neuen Chat öffnen; `ollama ps`
-  muss bei `CONTEXT` 16384 zeigen (Schritt 0), sonst schneidet Ollama Anweisung und Werkzeugbeschreibung ab.
+  muss bei `CONTEXT` 16384 oder 32768 zeigen (Schritt 0), sonst schneidet Ollama Anweisung und Werkzeugbeschreibung ab.
 - Antwort ohne Link → Anweisung des Agenten prüfen (Satz mit „Quelle: [Dateiname, Seite N](link)").
 - Link öffnet nichts → die Oberfläche des Dokumentenassistenten (Port 8765) läuft nicht.
 - Ollama muss laufen (`suchen` rechnet die Frage lokal um).
@@ -493,7 +513,7 @@ kennt den ganzen freigegebenen Bestand, liest Scans lokal und zeigt zu jeder Ant
 - **Scans und Bilder:** LibreChat hat keine lokale Texterkennung (OCR nur über Mistral, Azure oder Vertex) → über den Dokumentenassistenten.
 - **Websuche** braucht einen fremden Suchdienst.
 - **HTML-/React-Artefakte** laden einen Baustein aus dem Netz.
-- **Code ausführen** braucht einen eigenen Dienst (ClickHouse/code-interpreter).
+- **Code ausführen** braucht einen eigenen Dienst: die Code-Interpreter-API von LibreChat (`LIBRECHAT_CODE_API_KEY`, `LIBRECHAT_CODE_BASEURL` in `.env`).
 - **Kleine Modelle** halten Formatvorgaben (Artefakt-Rahmen, Werkzeugaufrufe) nicht immer ein.
 - **Tempo:** Eine Antwort mit Fundstelle dauert mit Gemma 12B auf einem 24-GB-Mac knapp 30 Sekunden.
 
@@ -507,11 +527,11 @@ kennt den ganzen freigegebenen Bestand, liest Scans lokal und zeigt zu jeder Ant
 
 | # | Was | Befehl | Soll |
 |---|---|---|---|
-| 1 | Ollama mit 16384 Kontext (macOS) | `launchctl setenv OLLAMA_CONTEXT_LENGTH 16384`, dann die Ollama-App öffnen | nach der ersten Frage zeigt `ollama ps` bei `CONTEXT` 16384 |
+| 1 | Ollama mit 16384 Kontext (macOS) | `launchctl setenv OLLAMA_CONTEXT_LENGTH 16384`, dann die Ollama-App öffnen | nach der ersten Frage zeigt `ollama ps` bei `CONTEXT` 16384 (oder 32768) |
 | 2 | MongoDB | Docker: `docker start librechat-mongo` · Homebrew: läuft per `brew services` von selbst | `nc -z 127.0.0.1 27017` meldet Erfolg |
 | 3 | Whisper (Terminal A) | der `whisper-server`-Befehl aus Schritt 4 | Terminal zeigt den Server auf Port 2022 |
 | 4 | Dokumentenassistent-Oberfläche (Terminal B) | `cd ~/Projects/dokumentenassistent`, dann `uv run dokumentenassistent --quelle ~/Projects/dokumentenassistent/beispiele/malerbetrieb-demo/Quelle --ziel ~/dokass-demo-ziel` | http://127.0.0.1:8765 öffnet sich; liefert die Dokumente hinter den Links |
-| 5 | LibreChat (Terminal C) | `cd ~/Projects/librechat`, `nvm use 24`, `npm run backend` | „Server listening at http://localhost:3080" |
+| 5 | LibreChat (Terminal C) | `cd ~/Projects/librechat`, `nvm use 24` (Homebrew-Node: die `export PATH=…`-Zeile aus Schritt 0), `npm run backend` | „Server listening at http://localhost:3080" |
 
 Linux: Ollama läuft als Dienst mit der Einstellung aus Schritt 0, Punkt 1 entfällt. Neu bauen (`npm run reinstall`) ist
 nur nach einem LibreChat-Update nötig, danach den Skin erneut setzen (Schritt 2).
@@ -526,7 +546,7 @@ nur nach einem LibreChat-Update nötig, danach den Skin erneut setzen (Schritt 2
 | etwas aus den Unterlagen wissen | Neuer Chat, im Modellmenü unter **My Agents** den „Abgleicher" wählen, Frage tippen; jede Unterlagen-Frage in einem neuen Chat |
 | ein Diagramm oder kleines Werkzeug | im Werkzeug-Menü **Artefakte** an, Kopiervorlagen aus Schritt 3 anpassen |
 | diktieren | Mikrofon neben dem Eingabefeld, sprechen, noch einmal klicken; Text prüfen, dann senden |
-| einen Agenten weitergeben | Agent öffnen → **Teilen** → Person → Rolle **Betrachter** (nutzen) oder **Bearbeiter** (ändern) |
+| einen Agenten weitergeben | als Admin: Agent öffnen → **Teilen** → Person → Rolle **Betrachter** (nutzen) oder **Bearbeiter** (ändern). Normale Konten dürfen ab Werk nicht teilen |
 
 **Neue Kollegen:** Jede Person registriert sich unter http://localhost:3080 mit eigenem Konto. Sind alle angelegt, die
 Registrierung schließen: in `~/Projects/librechat/.env` die Zeile `ALLOW_REGISTRATION=true` auf `false` setzen und
@@ -577,7 +597,7 @@ Vorher LibreChat im Terminal stoppen (Ctrl+C). Dateien z. B. in VS Code öffnen.
    - Alle Zeilen löschen, die mit `REACT_APP_THEME_` beginnen, und Kommentarzeilen `# ===== Firmengehirn…` /
      `# Navy n1…` von früher.
    - Den ganzen Inhalt von `~/firmengehirn-howto/firmengehirn-skin/neon/env-theme.txt` ans Ende kopieren
-     (2 Kommentarzeilen, 64 Farbzeilen).
+     (4 Kommentarzeilen, 64 Farbzeilen).
 2. **Bilder und Stylesheet:** alle Dateien aus `~/firmengehirn-howto/firmengehirn-skin/neon/assets/` nach
    `~/Projects/librechat/client/public/assets/` kopieren, Vorhandenes überschreiben (`logo.svg` ersetzt dabei
    LibreChats Logo auf der Anmeldeseite).
@@ -601,8 +621,8 @@ Vorher LibreChat im Terminal stoppen (Ctrl+C). Dateien z. B. in VS Code öffnen.
 
 ### B · Zurück zu „standard"
 
-1. `.env`: `APP_TITLE=LibreChat`, vor `CUSTOM_FOOTER` wieder ein `#`, alle `REACT_APP_THEME_`-Zeilen und die zwei
-   Kommentarzeilen darüber löschen.
+1. `.env`: `APP_TITLE=LibreChat`, vor `CUSTOM_FOOTER` wieder ein `#`, alle `REACT_APP_THEME_`-Zeilen und die vier
+   Kommentarzeilen des Skins (beginnen mit `# =====`, `# Navy`, `# Firmengehirn-Skin, Teil 2`, `# Zusätzlich`) löschen.
 2. In `client/public/assets/` alle Dateien löschen, die mit `firmengehirn` beginnen; die zwei neutralen Dateien aus
    `~/firmengehirn-howto/firmengehirn-skin/standard/assets/` hineinkopieren. Die neutrale `firmengehirn.js` ist
    nötig, weil LibreChat Farben im Browser speichert und sie sonst navy bleiben.

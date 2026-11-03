@@ -11,7 +11,7 @@ runs on your own machine.
 | | Deutsch | English |
 |---|---|---|
 | Anleitung · Guide | [HOWTO.md](HOWTO.md) | [HOWTO.en.md](HOWTO.en.md) |
-| Video | [Teil 1 · Part 1](https://www.youtube.com/watch?v=amr3TP7FztQ) | |
+| Video | [Teil 1 · Part 1](https://www.youtube.com/watch?v=amr3TP7FztQ) · [Teil 2 · Part 2](https://youtu.be/BWCP4s1hbfc) | |
 
 ## Inhalt · Contents
 
