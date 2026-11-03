@@ -1,0 +1,139 @@
+/* =====================================================================
+   Firmengehirn-Skin für LibreChat v0.8.8 (Karte 2)
+   Farben aus stil.js der Erklär-Serie — Bedeutung vor Schmuck, kein Gelb.
+   Eingebunden über eine <link>-Zeile in client/index.html.
+   Grundfarben kommen aus .env (REACT_APP_THEME_*), dieses Blatt setzt Akzente.
+   ===================================================================== */
+
+:root {
+  --fg-navy-1: #24255E;
+  --fg-navy-2: #3A3D8C;
+  --fg-navy-3: #6366C4;
+  --fg-frage: #8FA0FF;    /* Frage */
+  --fg-mathe: #3FC1D9;    /* Mathematik / Gehirn */
+  --fg-schreibt: #FF7AC6; /* Modell, das schreibt */
+  --fg-zuordnet: #F0913F; /* Modell, das zuordnet */
+  --fg-programm: #B48CFF; /* Programm */
+  --fg-ok: #7BD88F;
+  --fg-verlauf: linear-gradient(100deg, var(--fg-frage) 0%, var(--fg-mathe) 50%, var(--fg-schreibt) 100%);
+
+  /* rundere, weichere Formen */
+  --theme-control-radius: 1rem !important;
+  --theme-surface-radius: 1.25rem !important;
+  --theme-large-surface-radius: 1.75rem !important;
+}
+
+/* ---------- Hintergrund: Farbschimmer + Gehirn-Wasserzeichen ---------- */
+.bg-presentation {
+  background-image:
+    radial-gradient(900px 600px at 8% -10%, rgb(63 193 217 / 0.16), transparent 60%),
+    radial-gradient(800px 600px at 105% 110%, rgb(255 122 198 / 0.14), transparent 60%),
+    radial-gradient(700px 500px at 60% 40%, rgb(180 140 255 / 0.08), transparent 70%) !important;
+  background-attachment: fixed;
+}
+body::after {
+  content: '';
+  position: fixed;
+  right: -6vmin;
+  bottom: -6vmin;
+  width: 46vmin;
+  height: 46vmin;
+  background: url('/assets/firmengehirn-zeichen.svg') no-repeat center / contain;
+  opacity: 0.07;
+  pointer-events: none;
+  z-index: 0;
+}
+
+/* ---------- Überschriften im Serien-Verlauf ---------- */
+h1 {
+  background: var(--fg-verlauf);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent !important;
+  -webkit-text-fill-color: transparent;
+}
+/* Begrüßung wird Buchstabe für Buchstabe animiert: dort kein Verlauf möglich, stattdessen weiß mit Türkis-Glühen */
+.split-parent > span:not(.sr-only) {
+  color: #ffffff !important;
+  text-shadow: 0 0 22px rgb(63 193 217 / 0.6), 0 0 2px rgb(143 160 255 / 0.8);
+}
+h2 { color: var(--fg-mathe) !important; }
+
+/* Abschnitts-Etiketten (KI-MODELL, ANWEISUNGEN, TOOLS …) in Türkis */
+.uppercase { color: var(--fg-mathe) !important; letter-spacing: 0.06em; }
+
+/* ---------- Kategorie-Chips: jede in ihrer Serienfarbe ---------- */
+[role='tablist'] [role='tab'] {
+  border: 1.5px solid currentColor !important;
+  background: rgb(36 37 94 / 0.55) !important;
+  transition: box-shadow 0.2s, transform 0.2s;
+}
+[role='tablist'] [role='tab']:nth-child(6n + 1) { color: var(--fg-frage) !important; }
+[role='tablist'] [role='tab']:nth-child(6n + 2) { color: var(--fg-mathe) !important; }
+[role='tablist'] [role='tab']:nth-child(6n + 3) { color: var(--fg-schreibt) !important; }
+[role='tablist'] [role='tab']:nth-child(6n + 4) { color: var(--fg-programm) !important; }
+[role='tablist'] [role='tab']:nth-child(6n + 5) { color: var(--fg-zuordnet) !important; }
+[role='tablist'] [role='tab']:nth-child(6n + 6) { color: var(--fg-ok) !important; }
+[role='tablist'] [role='tab']:hover { transform: translateY(-1px); box-shadow: 0 0 18px -4px currentColor; }
+[role='tablist'] [role='tab'][aria-selected='true'] {
+  background: var(--fg-verlauf) !important;
+  color: var(--fg-navy-1) !important;
+  border-color: transparent !important;
+  box-shadow: 0 0 22px -6px var(--fg-mathe);
+}
+
+/* ---------- Linke Symbolleiste: Farbe nach Bedeutung (Serienlogik) ---------- */
+aside button svg, aside a svg { transition: color 0.2s, filter 0.2s; }
+[data-testid='new-chat-button'] svg,
+[data-testid='nav-panel-conversations'] svg { color: var(--fg-frage) !important; }            /* Frage */
+[data-testid='nav-agents-marketplace-button'] svg,
+[data-testid='nav-panel-agents'] svg { color: var(--fg-schreibt) !important; }                /* Modell, das schreibt */
+[data-testid='nav-panel-skills'] svg,
+[data-testid='nav-panel-prompts'] svg,
+[data-testid='nav-panel-mcp-builder'] svg { color: var(--fg-programm) !important; }           /* Programm */
+[data-testid='nav-panel-memories'] svg { color: var(--fg-mathe) !important; }                 /* Gedächtnis = Gehirn */
+[data-testid='nav-panel-files'] svg { color: var(--fg-zuordnet) !important; }                 /* Modell, das zuordnet */
+[data-testid='nav-panel-bookmarks'] svg { color: var(--fg-ok) !important; }                   /* bestätigt */
+aside button:hover svg, aside a:hover svg { filter: drop-shadow(0 0 6px currentColor); }
+aside [data-testid^='nav-panel-'][aria-pressed='true'],
+aside [data-testid^='nav-panel-'][data-state='active'],
+aside [data-testid^='nav-panel-'][aria-current='true'] {
+  background: rgb(255 255 255 / 0.06) !important;
+  box-shadow: inset 2px 0 0 currentColor, 0 0 16px -6px var(--fg-mathe);
+}
+
+/* ---------- Eingabefelder: Glühen beim Fokus ---------- */
+input:focus, textarea:focus, select:focus {
+  border-color: var(--fg-mathe) !important;
+  box-shadow: 0 0 0 1px var(--fg-mathe), 0 0 18px -4px var(--fg-mathe) !important;
+}
+
+/* Chat-Eingabe: Glasfläche mit Verlaufsrand */
+form .bg-surface-chat {
+  background: linear-gradient(rgb(46 48 112 / 0.85), rgb(46 48 112 / 0.85)) padding-box,
+              var(--fg-verlauf) border-box !important;
+  border: 1.5px solid transparent !important;
+  backdrop-filter: blur(8px);
+  box-shadow: 0 10px 40px -12px rgb(63 193 217 / 0.45);
+}
+
+/* ---------- Hauptknöpfe im Verlauf ---------- */
+.bg-surface-submit,
+button[data-testid='send-button']:not(:disabled) {
+  background: linear-gradient(100deg, var(--fg-frage), var(--fg-mathe)) !important;
+  color: var(--fg-navy-1) !important;
+  box-shadow: 0 6px 22px -8px var(--fg-mathe);
+}
+.bg-surface-submit:hover,
+button[data-testid='send-button']:not(:disabled):hover {
+  background: linear-gradient(100deg, var(--fg-mathe), var(--fg-schreibt)) !important;
+}
+
+/* Modellwahl oben: Gehirn-Türkis */
+button[data-testid='model-selector-button'] {
+  border-color: var(--fg-mathe) !important;
+  box-shadow: 0 0 16px -6px var(--fg-mathe);
+}
+
+/* Bildlaufleisten */
+* { scrollbar-color: var(--fg-navy-3) transparent; }

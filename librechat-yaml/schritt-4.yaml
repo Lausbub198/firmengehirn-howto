@@ -1,0 +1,51 @@
+# librechat.yaml nach Schritt 4 des HowTos „Das Firmengehirn zum Selberbauen" (LibreChat v0.8.8)
+# Wie Schritt 2, dazu Diktieren mit Whisper.
+# Nicht von Hand ausfüllen: Der Kopierbefehl im HowTo setzt den Modellnamen ein.
+version: 1.3.17
+
+# Begrüßung auf der Startseite (Schritt 2)
+interface:
+  customWelcome: 'Willkommen im Firmengehirn. Frag, was in unseren Unterlagen steht.'
+
+# Das Sprachmodell: LibreChat fragt Ollama auf diesem Rechner (Schritt 1)
+endpoints:
+  custom:
+    - name: "Ollama"
+      apiKey: "ollama"                      # Ollama prüft den Schlüssel nicht, das Feld muss aber da sein
+      baseURL: "http://localhost:11434/v1/"
+      models:
+        default: ["__MODELL__"]
+        fetch: false
+      titleConvo: true
+      titleModel: "current_model"
+      modelDisplayLabel: "Ollama"
+
+# Modellkarte „Firmengehirn" statt des technischen Modellnamens (Schritt 2)
+modelSpecs:
+  prioritize: true
+  addedEndpoints: [agents]          # sonst zeigt das Modellmenü nur die Karten unten, keine Agenten
+  list:
+    - name: "firmengehirn"
+      label: "Firmengehirn"
+      description: "läuft lokal auf diesem Rechner"
+      iconURL: "/assets/firmengehirn.svg"
+      showIconInMenu: true
+      showIconInHeader: true
+      default: true
+      preset:
+        endpoint: "Ollama"
+        model: "__MODELL__"
+        greeting: "Was möchtest du aus unseren Unterlagen wissen?"
+        promptPrefix: "Du bist das Firmengehirn eines kleinen Unternehmens. Antworte auf Deutsch, knapp und sachlich. Wenn du etwas nicht sicher weißt, sag das offen, statt zu raten."
+
+# Diktieren mit dem lokalen Whisper-Server (Schritt 4)
+speech:
+  stt:
+    allowedAddresses: ['127.0.0.1:2022']   # ohne diese Zeile sperrt LibreChat den lokalen Server (Schutz gegen SSRF)
+    openai:
+      url: 'http://127.0.0.1:2022/v1/audio/transcriptions'
+      model: 'whisper'
+      apiKey: 'lokal'
+  speechTab:
+    speechToText:
+      engineSTT: 'external'

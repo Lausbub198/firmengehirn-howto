@@ -1,0 +1,222 @@
+[
+ {
+  "title": "Angebot Fassadenanstrich Ringstraße 8 (synthetisch)",
+  "create_time": 1758700000,
+  "update_time": 1758700120,
+  "mapping": {
+   "60f0f527-db24-4af3-ad97-c4796859d92b": {
+    "id": "60f0f527-db24-4af3-ad97-c4796859d92b",
+    "message": null,
+    "parent": null,
+    "children": [
+     "d512cfd8-9743-4ecb-9258-4f031b3a810f"
+    ]
+   },
+   "d512cfd8-9743-4ecb-9258-4f031b3a810f": {
+    "id": "d512cfd8-9743-4ecb-9258-4f031b3a810f",
+    "parent": "60f0f527-db24-4af3-ad97-c4796859d92b",
+    "children": [
+     "18661f2d-b98a-4115-a4cc-9df685c01615"
+    ],
+    "message": {
+     "id": "d512cfd8-9743-4ecb-9258-4f031b3a810f",
+     "author": {
+      "role": "user",
+      "name": null,
+      "metadata": {}
+     },
+     "create_time": 1758700030,
+     "update_time": null,
+     "content": {
+      "content_type": "text",
+      "parts": [
+       "Wir sind die Malerbetrieb Hoffmann GmbH (fiktives Beispiel). Formuliere einen kurzen Angebotstext für den Fassadenanstrich Ringstraße 8, rund 240 m², Silikatfarbe, inklusive Gerüst."
+      ]
+     },
+     "status": "finished_successfully",
+     "end_turn": false,
+     "weight": 1.0,
+     "metadata": {},
+     "recipient": "all"
+    }
+   },
+   "18661f2d-b98a-4115-a4cc-9df685c01615": {
+    "id": "18661f2d-b98a-4115-a4cc-9df685c01615",
+    "parent": "d512cfd8-9743-4ecb-9258-4f031b3a810f",
+    "children": [
+     "195ee63e-781f-4771-95da-7be2cd58193e"
+    ],
+    "message": {
+     "id": "18661f2d-b98a-4115-a4cc-9df685c01615",
+     "author": {
+      "role": "assistant",
+      "name": null,
+      "metadata": {}
+     },
+     "create_time": 1758700060,
+     "update_time": null,
+     "content": {
+      "content_type": "text",
+      "parts": [
+       "Gern. Vorschlag: „Für den Fassadenanstrich am Objekt Ringstraße 8 (ca. 240 m²) bieten wir Ihnen einen zweifachen Anstrich mit Silikatfarbe an, inklusive Auf- und Abbau des Gerüsts. Die Arbeiten dauern bei trockener Witterung etwa acht Arbeitstage.“ Preise ergänze ich, sobald du mir die Kalkulation gibst."
+      ]
+     },
+     "status": "finished_successfully",
+     "end_turn": true,
+     "weight": 1.0,
+     "metadata": {
+      "model_slug": "gpt-4o"
+     },
+     "recipient": "all"
+    }
+   },
+   "195ee63e-781f-4771-95da-7be2cd58193e": {
+    "id": "195ee63e-781f-4771-95da-7be2cd58193e",
+    "parent": "18661f2d-b98a-4115-a4cc-9df685c01615",
+    "children": [
+     "0746eaf2-6635-47c5-846d-886f4dbb3694"
+    ],
+    "message": {
+     "id": "195ee63e-781f-4771-95da-7be2cd58193e",
+     "author": {
+      "role": "user",
+      "name": null,
+      "metadata": {}
+     },
+     "create_time": 1758700090,
+     "update_time": null,
+     "content": {
+      "content_type": "text",
+      "parts": [
+       "Mach den Ton etwas persönlicher."
+      ]
+     },
+     "status": "finished_successfully",
+     "end_turn": false,
+     "weight": 1.0,
+     "metadata": {},
+     "recipient": "all"
+    }
+   },
+   "0746eaf2-6635-47c5-846d-886f4dbb3694": {
+    "id": "0746eaf2-6635-47c5-846d-886f4dbb3694",
+    "parent": "195ee63e-781f-4771-95da-7be2cd58193e",
+    "children": [],
+    "message": {
+     "id": "0746eaf2-6635-47c5-846d-886f4dbb3694",
+     "author": {
+      "role": "assistant",
+      "name": null,
+      "metadata": {}
+     },
+     "create_time": 1758700120,
+     "update_time": null,
+     "content": {
+      "content_type": "text",
+      "parts": [
+       "„Liebe Familie Beispiel, gern übernehmen wir den Fassadenanstrich an Ihrem Haus in der Ringstraße 8 …“ – soll ich auch einen Satz zur Farbberatung vor Ort ergänzen?"
+      ]
+     },
+     "status": "finished_successfully",
+     "end_turn": true,
+     "weight": 1.0,
+     "metadata": {
+      "model_slug": "gpt-4o"
+     },
+     "recipient": "all"
+    }
+   }
+  },
+  "moderation_results": [],
+  "current_node": "0746eaf2-6635-47c5-846d-886f4dbb3694",
+  "plugin_ids": null,
+  "conversation_id": "d0f7d2e1-4835-43b1-b26c-215147cfa4a3",
+  "conversation_template_id": null,
+  "gizmo_id": null,
+  "is_archived": false,
+  "safe_urls": [],
+  "default_model_slug": "gpt-4o",
+  "id": "d0f7d2e1-4835-43b1-b26c-215147cfa4a3"
+ },
+ {
+  "title": "Betriebsurlaub-Aushang 2025 (synthetisch)",
+  "create_time": 1758800000,
+  "update_time": 1758800060,
+  "mapping": {
+   "b23c4f40-c2fc-42b5-9dea-32e2ef77bd93": {
+    "id": "b23c4f40-c2fc-42b5-9dea-32e2ef77bd93",
+    "message": null,
+    "parent": null,
+    "children": [
+     "8ba5b16b-ce3f-4949-8d46-09f97919f258"
+    ]
+   },
+   "8ba5b16b-ce3f-4949-8d46-09f97919f258": {
+    "id": "8ba5b16b-ce3f-4949-8d46-09f97919f258",
+    "parent": "b23c4f40-c2fc-42b5-9dea-32e2ef77bd93",
+    "children": [
+     "1dbef7e1-554c-42f8-8e16-ba9a5df7acb3"
+    ],
+    "message": {
+     "id": "8ba5b16b-ce3f-4949-8d46-09f97919f258",
+     "author": {
+      "role": "user",
+      "name": null,
+      "metadata": {}
+     },
+     "create_time": 1758800030,
+     "update_time": null,
+     "content": {
+      "content_type": "text",
+      "parts": [
+       "Schreib einen Aushang: Betriebsurlaub vom 28.07. bis 08.08.2025, Notdienst über Handy erreichbar."
+      ]
+     },
+     "status": "finished_successfully",
+     "end_turn": false,
+     "weight": 1.0,
+     "metadata": {},
+     "recipient": "all"
+    }
+   },
+   "1dbef7e1-554c-42f8-8e16-ba9a5df7acb3": {
+    "id": "1dbef7e1-554c-42f8-8e16-ba9a5df7acb3",
+    "parent": "8ba5b16b-ce3f-4949-8d46-09f97919f258",
+    "children": [],
+    "message": {
+     "id": "1dbef7e1-554c-42f8-8e16-ba9a5df7acb3",
+     "author": {
+      "role": "assistant",
+      "name": null,
+      "metadata": {}
+     },
+     "create_time": 1758800060,
+     "update_time": null,
+     "content": {
+      "content_type": "text",
+      "parts": [
+       "Aushang: „Liebe Kundinnen und Kunden, unser Betrieb macht vom 28.07. bis 08.08.2025 Sommerpause. In dringenden Fällen erreichen Sie unseren Notdienst über die bekannte Handynummer. Ab dem 11.08. sind wir wieder voll für Sie da. Ihr Malerbetrieb Hoffmann“"
+      ]
+     },
+     "status": "finished_successfully",
+     "end_turn": true,
+     "weight": 1.0,
+     "metadata": {
+      "model_slug": "gpt-4o"
+     },
+     "recipient": "all"
+    }
+   }
+  },
+  "moderation_results": [],
+  "current_node": "1dbef7e1-554c-42f8-8e16-ba9a5df7acb3",
+  "plugin_ids": null,
+  "conversation_id": "b1ca4988-efcf-433b-800f-4c5bbce3d6ec",
+  "conversation_template_id": null,
+  "gizmo_id": null,
+  "is_archived": false,
+  "safe_urls": [],
+  "default_model_slug": "gpt-4o",
+  "id": "b1ca4988-efcf-433b-800f-4c5bbce3d6ec"
+ }
+]
